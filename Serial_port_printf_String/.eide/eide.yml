@@ -92,7 +92,7 @@ virtualFolder:
 dependenceList: []
 outDir: build
 miscInfo:
-  uid: a35738f89b6de5b4b53c0d726a5ca7ad
+  uid: bbdc875f2197e268b0821b657a436097
 targets:
   default:
     cppPreprocessAttrs:
@@ -109,6 +109,7 @@ targets:
         - RTE/_default
       libList: []
     excludeList: []
+    settings: {}
     toolchain: AC5
     toolchainConfigMap:
       AC5:
@@ -118,7 +119,10 @@ targets:
         options:
           version: 4
           afterBuildTasks: []
-          asm-compiler: {}
+          asm-compiler:
+            defines:
+              - STM32F10X_MD
+              - USE_STDPERIPH_DRIVER
           beforeBuildTasks: []
           c/cpp-compiler:
             CXX_FLAGS: --no-multibyte-chars
@@ -228,4 +232,14 @@ targets:
         bin: ""
         interface: stlink
         target: stm32f1x
-    uploader: OpenOCD
+      STLink:
+        address: "0x8000000"
+        bin: ""
+        elFile: None
+        optionBytes: .eide/default.st.option.bytes.ini
+        otherCmds: ""
+        proType: SWD
+        resetMode: default
+        runAfterProgram: true
+        speed: 4000
+    uploader: STLink

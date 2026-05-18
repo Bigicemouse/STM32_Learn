@@ -1,316 +1,111 @@
-/*
- * ========================================================
- * ´®¿Ú printf Êä³öÊ¾Àý³ÌÐò
- * ¹¦ÄÜ£ºÅäÖÃ USART1 ´®¿ÚÍ¨ÐÅ£¬ÊµÏÖ printf º¯ÊýÊä³öµ½´®¿Ú
- * Ô­Àí£ºÍ¨¹ýÖØ¶¨Ïò fputc º¯Êý½«±ê×¼Êä³öÖØÐÂ¶¨Ïòµ½´®¿Ú
- * ========================================================
+#include "Delay.h"
+#include "stm32f10x.h"
+#include <stdio.h>
+
+void my_USART_SendBytes(USART_TypeDef *USARTx, uint8_t *pData, uint8_t size);
+/* åˆå§‹åŒ– USART1ï¼ˆGPIO + AFIO + å¤–è®¾ï¼‰ */
+void my_USART1_Init(void);
+
+/* ä¸»å‡½æ•°å…¥å£
+ * å½“å‰ç¤ºä¾‹å®Œæˆä¸²å£åˆå§‹åŒ–åŽï¼Œå‘é€ä¸€ç»„æµ‹è¯•å­—èŠ‚ï¼Œç„¶åŽåœç•™åœ¨ç©ºå¾ªçŽ¯ä¸­
  */
-
-#include "Delay.h"     // ÑÓÊ±º¯Êý¿â
-#include "stm32f10x.h" // STM32F10x ±ê×¼ÍâÉè¿âÍ·ÎÄ¼þ
-#include "usart.h"     // ´®¿ÚÇý¶¯¿â
-#include <stdio.h>     // C ±ê×¼¿â£º°üº¬ printf() ºÍ fputc() ½Ó¿Ú
-
-/* ========================================================
- * º¯ÊýÉùÃ÷£ºÍ¨ÓÃ USART ³õÊ¼»¯º¯Êý
- * ======================================================== */
-void my_USART_Init(USART_TypeDef *USARTx, uint32_t BaudRate, GPIO_TypeDef *GPIOx,
-                   uint16_t TX_Pin, uint16_t RX_Pin, uint32_t GPIO_Remap);
-
-/* ========================================================
- * Ö÷º¯Êý£º³ÌÐòÈë¿Ú
- * ======================================================== */
 int main(void)
 {
-    /* ---- ³õÊ¼»¯ USART1 ´®¿Ú ---- */
-    /* ²ÎÊý½âÊÍ£º
-     *   USART1                 - Ê¹ÓÃ USART1 ÍâÉè
-     *   115200                 - ²¨ÌØÂÊ£º115200 bps
-     *   GPIOB                  - Ê¹ÓÃ GPIO ¶Ë¿Ú B
-     *   GPIO_Pin_6             - TX ·¢ËÍÒý½Å£¨PB6£©
-     *   GPIO_Pin_7             - RX ½ÓÊÕÒý½Å£¨PB7£©
-     *   GPIO_Remap_USART1      - ÆôÓÃ USART1 µÄÒý½ÅÖØÓ³ÉäÅäÖÃ
-     */
-    my_USART_Init(USART1, 115200, GPIOB, GPIO_Pin_6, GPIO_Pin_7, GPIO_Remap_USART1);
+    /* åˆå§‹åŒ– USART1ï¼ˆGPIO + AFIO + å¤–è®¾ï¼‰ */
+    my_USART1_Init();
 
-    /* ==================== ·¢ËÍ²âÊÔÊý¾Ý ==================== */
-
-    /* ÒÔÏÂ×¢ÊÍµôµÄº¯ÊýÔÚµ±Ç°¿âÖÐÎ´ÊµÏÖ£¬¿ÉÑ¡ÓÃ */
-    // My_USART_SendString(USART1, "hello");               // ·¢ËÍ×Ö·û´®£¨¿âº¯Êý£©
-    // My_USART_Printf(USART1, "Temperature: %d\r\n", 25); // ·¢ËÍ¸ñÊ½»¯×Ö·û´®£¨¿âº¯Êý£©
-
-    /* Ê¹ÓÃ±ê×¼ C ¿âµÄ printf º¯Êý£¬Í¨¹ý fputc() ÖØ¶¨Ïòµ½´®¿Ú·¢ËÍ */
-    printf("hello\r\n");               // ·¢ËÍ "hello" ¼Ó»Ø³µ»»ÐÐ
-    printf("Temperature: %d\r\n", 25); // ·¢ËÍ¸ñÊ½»¯×Ö·û´®£ºÎÂ¶ÈÖµÎª 25
-
-    /* ==================== Ö÷Ñ­»· ==================== */
     while (1)
     {
-        /* ³ÌÐòÔÚ´ËÑ­»·µÈ´ý£¬±£³ÖÉè±¸ÔËÐÐ */
-        /* Êµ¼ÊÓ¦ÓÃÖÐÕâÀï¿ÉÒÔÌí¼Ó°´¼ü¼ì²â¡¢´«¸ÐÆ÷¶ÁÈ¡µÈ²Ù×÷ */
+        printf("Hello, USART1!\n");
+        Delay(1000);
+        printf("This is a test message.\n");
+        Delay(1000);
     }
-
-    return 0; // Ò»°ã²»»áÖ´ÐÐµ½´Ë£¬ÒòÎª while(1) »áÒ»Ö±Ñ­»·
 }
 
-/* ========================================================
- * @brief  USART Í¨ÓÃ³õÊ¼»¯º¯Êý£¨È«¾ÖÊ¹ÓÃ£©
- *
- * ¹¦ÄÜ£ºÍêÕûÅäÖÃÒ»¸ö USART ÍâÉè£¬°üÀ¨Ê±ÖÓ¡¢GPIO¡¢Òý½ÅÖØÓ³Éä¡¢
- *       ²¨ÌØÂÊ¡¢Êý¾Ý¸ñÊ½µÈ£¬Ò»´Îµ÷ÓÃ¼´¿ÉÍêÈ«³õÊ¼»¯´®¿Ú¡£
- *
- * @param  USARTx        - Ö¸¶¨Òª³õÊ¼»¯µÄ USART ÍâÉè
- *                        (USART1/USART2/USART3 µÈ)
- * @param  BaudRate      - ²¨ÌØÂÊ£¬µ¥Î» bps
- *                        ³£ÓÃÖµ£º9600, 19200, 38400, 115200 µÈ
- * @param  GPIOx         - USART µÄ GPIO ¶Ë¿Ú
- *                        (GPIOA/GPIOB/GPIOC/GPIOD/GPIOE)
- * @param  TX_Pin        - ·¢ËÍÒý½Å£¨GPIO_Pin_0 ~ GPIO_Pin_15£©
- * @param  RX_Pin        - ½ÓÊÕÒý½Å£¨GPIO_Pin_0 ~ GPIO_Pin_15£©
- * @param  GPIO_Remap    - GPIO Òý½ÅÖØÓ³ÉäÅäÖÃ
- *                        ÓÐÖØÓ³ÉäÊ±Ìî GPIO_Remap_USART1 µÈ
- *                        ÎÞÖØÓ³ÉäÊ±Ìî 0
- *
- * @return ÎÞ·µ»ØÖµ
- *
- * @note   ±ê×¼ÅäÖÃ£º
- *         - Êý¾ÝÎ»£º8 Î»
- *         - Í£Ö¹Î»£º1 Î»
- *         - ÆæÅ¼Ð£Ñé£ºÎÞ
- *         - ÊÕ·¢Ä£Ê½£ºÍ¬Ê±Ö§³Ö½ÓÊÕºÍ·¢ËÍ
- *
- * Ê¹ÓÃÊ¾Àý£º
- *   // USART1 Ê¹ÓÃÖØÓ³Éä£¨PB6-TX, PB7-RX£©
- *   my_USART_Init(USART1, 115200, GPIOB, GPIO_Pin_6, GPIO_Pin_7, GPIO_Remap_USART1);
- *
- *   // USART2 ²»Ê¹ÓÃÖØÓ³Éä£¨PA2-TX, PA3-RX£©
- *   my_USART_Init(USART2, 115200, GPIOA, GPIO_Pin_2, GPIO_Pin_3, 0);
- * ======================================================== */
-void my_USART_Init(USART_TypeDef *USARTx, uint32_t BaudRate, GPIO_TypeDef *GPIOx,
-                   uint16_t TX_Pin, uint16_t RX_Pin, uint32_t GPIO_Remap)
-{
-    /* ================ µÚ 1 ½×¶Î£ºGPIO Óë AFIO Ê±ÖÓºÍÖØÓ³ÉäÅäÖÃ ================ */
-
-    /* ²½Öè 1.1£º¿ªÆô AFIO Ê±ÖÓ
-     * ËµÃ÷£ºÔÚÊ¹ÓÃ GPIO Òý½ÅÖØÓ³Éä£¨Remap£©¹¦ÄÜÊ±±ØÐè¿ªÆô AFIO Ê±ÖÓ
-     *       AFIO ÊÇ Alternate Function I/O£¨Ìæ´ú¹¦ÄÜ I/O£©£¬¿ØÖÆÒý½ÅµÄ¸´ÓÃ¹¦ÄÜ
-     */
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
-
-    /* ²½Öè 1.2£ºÌõ¼þÖ´ÐÐÒý½ÅÖØÓ³Éä
-     * ËµÃ÷£ºÈç¹û GPIO_Remap ²»Îª 0£¬ÔòÖ´ÐÐÖØÓ³Éä
-     *       ÖØÓ³Éä¿É½«´®¿Ú TX/RX Ç¨ÒÆµ½²»Í¬µÄÒý½ÅÉÏ£¬Áé»îÉè¼Æ PCB
-     */
-    if (GPIO_Remap != 0)
-    {
-        GPIO_PinRemapConfig(GPIO_Remap, ENABLE);
-    }
-
-    /* ²½Öè 1.3£º¸ù¾Ý²»Í¬µÄ GPIO ¶Ë¿Ú¿ªÆô¶ÔÓ¦Ê±ÖÓ
-     * ËµÃ÷£ºÔÚÅäÖÃ GPIO Ç°±ØÐë¿ªÆôÆäÊ±ÖÓ£¬STM32 Ê¹ÓÃ´Ë»úÖÆ½ÚÊ¡¹¦ºÄ
-     *       Ã¿¸ö GPIO ¶Ë¿Ú¶¼ÓÐ¶ÀÁ¢µÄÊ±ÖÓ¿ØÖÆÎ»
-     */
-    if (GPIOx == GPIOA)
-        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-    else if (GPIOx == GPIOB)
-        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
-    else if (GPIOx == GPIOC)
-        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
-    else if (GPIOx == GPIOD)
-        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE);
-    else if (GPIOx == GPIOE)
-        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOE, ENABLE);
-
-    /* ²½Öè 1.4£º³õÊ¼»¯ GPIO ÅäÖÃ½á¹¹Ìå£¨½«ÆäÇåÁã£©
-     * ËµÃ÷£ºgpio_initStruct ÓÃÓÚ´æ´¢ GPIO µÄÅäÖÃ²ÎÊý£¬ÏÈÇåÁã·ÀÖ¹À¬»øÊý¾Ý
-     */
-    GPIO_InitTypeDef gpio_initStruct = {0};
-
-    /* ================ µÚ 2 ½×¶Î£ºÅäÖÃ TX£¨·¢ËÍ£©Òý½Å ================ */
-    /* ²½Öè 2.1£ºÖ¸¶¨ TX Òý½Å±àºÅ */
-    gpio_initStruct.GPIO_Pin = TX_Pin;
-
-    /* ²½Öè 2.2£ºÉèÖÃ TX Òý½ÅÄ£Ê½Îª¸´ÓÃÍÆÍìÊä³ö
-     * GPIO_Mode_AF_PP = Alternate Function Push-Pull£¨¸´ÓÃÍÆÍì£©
-     * ËµÃ÷£º
-     *   - ¸´ÓÃ£¨AF£©£ºÓÉÍâÉè£¨USART£©Çý¶¯£¬¶ø²»ÊÇ GPIO Èí¼þ
-     *   - ÍÆÍì£¨PP£©£ºÄÜÖ÷¶¯À­¸ßÀ­µÍµçÑ¹£¬ÊÊºÏÊä³öÇý¶¯
-     *   - ÕâÊÇ UART ·¢ËÍÏßµÄ±ê×¼ÅäÖÃ
-     */
-    gpio_initStruct.GPIO_Mode = GPIO_Mode_AF_PP;
-
-    /* ²½Öè 2.3£ºÉèÖÃ TX Òý½ÅÊä³öËÙÂÊÎª 10MHz
-     * ËµÃ÷£ºÉèÖÃ GPIO µÄÇÐ»»ËÙ¶È£¬10MHz ¶ÔÓÚ´®¿ÚÍ¨ÐÅ×ã¹»
-     *       ÆäËûÑ¡ÏîÓÐ 2MHz£¨µÍ¹¦ºÄ£©¡¢50MHz£¨¸ßËÙ£©
-     */
-    gpio_initStruct.GPIO_Speed = GPIO_Speed_10MHz;
-
-    /* ²½Öè 2.4£º½«ÅäÖÃÓ¦ÓÃµ½ TX Òý½Å */
-    GPIO_Init(GPIOx, &gpio_initStruct);
-
-    /* ================ µÚ 3 ½×¶Î£ºÅäÖÃ RX£¨½ÓÊÕ£©Òý½Å ================ */
-    /* ²½Öè 3.1£ºÖ¸¶¨ RX Òý½Å±àºÅ */
-    gpio_initStruct.GPIO_Pin = RX_Pin;
-
-    /* ²½Öè 3.2£ºÉèÖÃ RX Òý½ÅÄ£Ê½ÎªÉÏÀ­ÊäÈë
-     * GPIO_Mode_IPU = Input with Pull-Up£¨ÉÏÀ­ÊäÈë£©
-     * ËµÃ÷£º
-     *   - ÊäÈë£¨I£©£º½ÓÊÕÍâ²¿ÐÅºÅ£¬¸ß×è¿¹Ì¬
-     *   - ÉÏÀ­£¨PU£©£ºÄÚ²¿ÉÏÀ­µç×èÈÃÒý½ÅÇ÷Ïò¸ßµçÆ½
-     *   - UART ¿ÕÏÐÊ±Îª¸ßµçÆ½£¬ËùÒÔÐèÒªÉÏÀ­±£Ö¤µçÆ½ÎÈ¶¨
-     */
-    gpio_initStruct.GPIO_Mode = GPIO_Mode_IPU;
-
-    /* ²½Öè 3.3£º½«ÅäÖÃÓ¦ÓÃµ½ RX Òý½Å
-     * ×¢Òâ£ºGPIO_Speed ¶ÔÊäÈëÄ£Ê½ÎÞÓ°Ïì£¬¿É²»ÉèÖÃ
-     */
-    GPIO_Init(GPIOx, &gpio_initStruct);
-
-    /* ================ µÚ 4 ½×¶Î£ºUSART ÍâÉèÊ±ÖÓÅäÖÃ ================ */
-    /* ²½Öè 4.1£º¸ù¾Ý²»Í¬µÄ USART ¿ªÆô¶ÔÓ¦µÄÊ±ÖÓ
-     * ËµÃ÷£º
-     *   - USART1 ¹ÒÔÚ APB2 ×ÜÏßÉÏ£¨¸ßËÙ×ÜÏß£©
-     *   - USART2/USART3 ¹ÒÔÚ APB1 ×ÜÏßÉÏ£¨µÍËÙ×ÜÏß£©
-     *   - STM32F10x µÄÊ±ÖÓÊ÷¾ö¶¨ÁËÕâ¸ö·ÖÅä
-     */
-    if (USARTx == USART1)
-        RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
-    else if (USARTx == USART2)
-        RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
-    else if (USARTx == USART3)
-        RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
-
-    /* ================ µÚ 5 ½×¶Î£ºUSART ²ÎÊýÅäÖÃ ================ */
-    /* ²½Öè 5.1£º³õÊ¼»¯ USART ÅäÖÃ½á¹¹Ìå */
-    USART_InitTypeDef unit_initStruct = {0};
-
-    /* ²½Öè 5.2£ºÉèÖÃ²¨ÌØÂÊ
-     * ËµÃ÷£º²¨ÌØÂÊÊÇ´®¿ÚÍ¨ÐÅµÄËÙ¶È£¬µ¥Î» bps£¨±ÈÌØ/Ãë£©
-     *       ³£¼û: 9600, 115200 µÈ
-     *       ²¨ÌØÂÊ¹ý¸ß»áÔö¼ÓÎóÂëÂÊ£»¹ýµÍ»áÀË·ÑÊ±¼ä
-     */
-    unit_initStruct.USART_BaudRate = BaudRate;
-
-    /* ²½Öè 5.3£ºÍ¬Ê±ÆôÓÃ½ÓÊÕºÍ·¢ËÍÄ£Ê½
-     * USART_Mode_Rx | USART_Mode_Tx = ¼È¿É½ÓÊÕÒ²¿É·¢ËÍ
-     * ËµÃ÷£º
-     *   - Rx£¨½ÓÊÕ£©£º¼àÌý RX Ïß£¬½ÓÊÕ±ðÈËµÄÊý¾Ý
-     *   - Tx£¨·¢ËÍ£©£ºÇý¶¯ TX Ïß£¬ÏòÍâ·¢ËÍÊý¾Ý
-     *   - Ê¹ÓÃ | ÔËËã·ûÍ¬Ê±ÆôÓÃÁ½¸öÄ£Ê½£¨È«Ë«¹¤Í¨ÐÅ£©
-     */
-    unit_initStruct.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-
-    /* ²½Öè 5.4£ºÉèÖÃÊý¾ÝÖ¡¸ñÊ½
-     * ËµÃ÷£º¶¨ÒåÃ¿´Î·¢ËÍ/½ÓÊÕµÄÊý¾ÝÎ»ÊýºÍÐ£Ñé·½Ê½
-     */
-
-    /* Êý¾ÝÎ»£º8 Î»
-     * ËµÃ÷£ºÃ¿¸ö×Ö·ûÓÉ 8 ¸öÊý¾ÝÎ»×é³É£¬¿É±íÊ¾ 0~255 µÄÖµ
-     *       8 Î»ÊÇ¹¤Òµ±ê×¼£¬Ö§³ÖÍêÕûµÄ ASCII ×Ö·û¼¯
-     */
-    unit_initStruct.USART_WordLength = USART_WordLength_8b;
-
-    /* Í£Ö¹Î»£º1 Î»
-     * ËµÃ÷£ºÔÚ 8 ¸öÊý¾ÝÎ»Ö®ºó²åÈë 1 ¸öÍ£Ö¹Î»£¬±ê¼Ç×Ö·ûµÄ½áÊø
-     *       Í£Ö¹Î»ÈÃ½ÓÊÕÆ÷ÓÐÊ±¼ä´¦ÀíÊý¾Ý£¬ÎªÏÂÒ»¸ö×Ö·û×ö×¼±¸
-     *       Ò²¿ÉÑ¡Ôñ 2 Î»Í£Ö¹Î»£¨USART_StopBits_2£©
-     */
-    unit_initStruct.USART_StopBits = USART_StopBits_1;
-
-    /* ÆæÅ¼Ð£Ñé£ºÎÞ
-     * ËµÃ÷£º²»Ê¹ÓÃÆæÅ¼Ð£ÑéÎ»£¬ÒòÎª´®¿ÚÏß¶Ì¾àÀë´«ÊäÔëÉùÐ¡
-     *       ÈçÐè¿É¿¿ÐÔ¿ÉÑ¡ Odd£¨ÆæÊý£©»ò Even£¨Å¼Êý£©Ð£Ñé
-     */
-    unit_initStruct.USART_Parity = USART_Parity_No;
-
-    /* ²½Öè 5.5£º½«²ÎÊýÅäÖÃÓ¦ÓÃµ½ USART ¼Ä´æÆ÷
-     * ËµÃ÷£ºUSART_Init º¯Êý¸üÐÂ USART µÄ²¨ÌØÂÊÉú³ÉÆ÷ºÍ¿ØÖÆ¼Ä´æÆ÷
-     */
-    USART_Init(USARTx, &unit_initStruct);
-
-    /* ================ µÚ 6 ½×¶Î£ºÊ¹ÄÜ´®¿Ú ================ */
-    /* ²½Öè 6.1£ºÆôÓÃ USART ÍâÉè
-     * ËµÃ÷£ºËäÈ»ÒÑÅäÖÃ²ÎÊý£¬µ«±ØÐëÏÔÊ½Ê¹ÄÜ²ÅÄÜ¹¤×÷
-     *       USART_Cmd(..., ENABLE) ÉèÖÃ USART_CR1 µÄ UE Î»
-     */
-    USART_Cmd(USARTx, ENABLE);
-
-    /* ³õÊ¼»¯Íê³É£¬´ËÊ± USART ÒÑÍêÈ«¿ÉÓÃ */
-}
-
-/* ================================================================
- * º¯ÊýÃû³Æ: fputc£¨File PUT Character£©
- *
- * ¹¦ÄÜÃèÊö£º
- *   ÖØ¶¨Ïò C ±ê×¼¿âµÄÎÄ¼þ I/O µ½´®¿Ú
- *   µ±³ÌÐòµ÷ÓÃ printf() Ê±£¬±ê×¼¿â»áÖð¸ö×Ö·ûµØµ÷ÓÃ fputc()
- *   Í¨¹ýÖØ¶¨Òå´Ëº¯Êý£¬ÎÒÃÇ¿ÉÒÔ½«Êä³öÖØ¶¨Ïòµ½´®¿Ú¶ø·ÇÄ¬ÈÏµÄµ÷ÊÔÆ÷
- *
- * ¹¤×÷Ô­Àí£º
- *   1. printf("format", args) ÔÚÄÚ²¿´¦Àí¸ñÊ½×Ö·û´®ºÍ²ÎÊý
- *   2. ¶ÔÓÚÃ¿¸öÒªÊä³öµÄ×Ö·û£¬printf µ÷ÓÃ fputc(ch, stdout)
- *   3. ÎÒÃÇµÄ fputc º¯Êý½«×Ö·ûÍ¨¹ý USART_SendData ·¢ËÍµ½´®¿Ú
- *   4. ½ÓÊÕ¶Ë£¨Èç´®¿ÚÖúÊÖ£©¶ÁÈ¡·¢ËÍµÄÊý¾Ý²¢ÏÔÊ¾
- *
- * @param  ch - ´ý·¢ËÍ×Ö·ûµÄ ASCII Öµ£¨int ÀàÐÍ£©
- *             ·¶Î§£º0~127 ÓÃÓÚ±ê×¼ ASCII£¬0~255 ÓÃÓÚÀ©Õ¹ ASCII
- *
- * @param  f  - FILE Ö¸Õë£¨±ê×¼¿âÖÐµÄ³éÏóÎÄ¼þÖ¸Õë£©
- *            ´Ë²ÎÊýÍ¨³£Îª stdout£¨±ê×¼Êä³ö£©£¬µ«ÔÚ´ËÒ²¿ÉºöÂÔ
- *            º¯ÊýÊÕµ½´Ë²ÎÊýÊÇÎªÁË¼æÈÝÆäËûÊä³öÁ÷
- *
- * @return ch - ·µ»Ø·¢ËÍµÄ×Ö·ûÖµ
- *            ³É¹¦Ê±·µ»Ø×Ö·û±¾Éí£»Ä³Ð©´íÎóÇé¿öÏÂ·µ»Ø EOF(-1)
- *            ´Ë´¦×ÜÊÇ·µ»Ø ch£¬±íÊ¾·¢ËÍ³É¹¦
- *
- * @note
- *   1. ´Ëº¯ÊýÓÉ±ê×¼¿â×Ô¶¯µ÷ÓÃ£¬³ÌÐòÔ±ÎÞÐèÊÖ¶¯µ÷ÓÃ
- *   2. ±ØÐë°üº¬ <stdio.h> Í·ÎÄ¼þ£¬·ñÔòÁ´½ÓÆ÷ÕÒ²»µ½ fputc
- *   3. º¯ÊýÖÐÊ¹ÓÃ USART1£¨Ó²±àÂë£©£¬ÈôÐè¶à´®¿ÚÇÐ»»Ðè¸ÄÎªÈ«¾Ö±äÁ¿
- *   4. µÈ´ý±êÖ¾Î»Ê±»á×èÈû£¬ÈôÃ»ÓÐÓ²¼þ¿ÉÄÜ¿¨ËÀ
- *
- * Ö´ÐÐÁ÷³ÌÍ¼£º
- *   printf("hello")
- *     ¡ý
- *   printf ÄÚ²¿Öð×Ö·ûµ÷ÓÃ fputc
- *     ¡ý
- *   fputc('h', stdout) ±»µ÷ÓÃ
- *     ¡ý
- *   µÈ´ý TXE ±êÖ¾£¨·¢ËÍÊý¾Ý¼Ä´æÆ÷¿Õ£©
- *     ¡ý
- *   USART_SendData(USART1, 'h') ·¢ËÍ×Ö·û
- *     ¡ý
- *   µÈ´ý TC ±êÖ¾£¨·¢ËÍÍê³É£©
- *     ¡ý
- *   ·µ»Ø 'h'£¬printf ¼ÌÐø·¢ËÍÏÂÒ»¸ö×Ö·û...
- * ================================================================ */
+/* é‡å®šå‘æ ‡å‡†åº“ fputc()
+ * printf æœ€ç»ˆä¼šé€å­—ç¬¦è°ƒç”¨æœ¬å‡½æ•°ï¼Œå› æ­¤è¿™é‡Œåªéœ€è¦ä¿è¯å•å­—èŠ‚å‘é€æ­£ç¡®å³å¯
+ * å½“å‰å®žçŽ°å›ºå®šè¾“å‡ºåˆ° USART1ï¼Œé€‚åˆæœ¬å·¥ç¨‹çš„å•ä¸²å£è°ƒè¯•åœºæ™¯
+ */
 int fputc(int ch, FILE *f)
 {
-    volatile uint32_t timeout;
-    (void)f;
-
-    /* ½« LF ×ªÎª CRLF£¬ÊÊÅä´ó¶àÊý´®¿ÚÖÕ¶ËÏÔÊ¾ */
-    if (ch == '\n')
-    {
-        timeout = 0x1FFFF;
-        while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET)
-        {
-            if (--timeout == 0)
-                return EOF;
-        }
-        USART_SendData(USART1, (uint16_t)'\r');
-    }
-
-    /* µÈ´ý·¢ËÍÊý¾Ý¼Ä´æÆ÷¿Õ£¬ÔÙÐ´ÈëÊý¾Ý£»¼Ó³¬Ê±·ÀÖ¹Ó²¼þÒì³£¿¨ËÀ */
-    timeout = 0x1FFFF;
+    /* ç­‰å¾…å‘é€æ•°æ®å¯„å­˜å™¨ç©ºï¼Œç¡®ä¿å½“å‰å­—ç¬¦å¯ä»¥å†™å…¥ */
     while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET)
+        ;
+
+    /* å°† printf ä¼ å…¥çš„å­—ç¬¦å†™å…¥ USART1 æ•°æ®å¯„å­˜å™¨ */
+    USART_SendData(USART1, (uint8_t)ch);
+
+    return ch; // è¿”å›žå‘é€çš„å­—ç¬¦ï¼Œç¬¦åˆ fputc çš„è¿”å›žè§„èŒƒ
+}
+
+/* é˜»å¡žæ–¹å¼å‘é€å­—èŠ‚æ•°ç»„
+ * æ‰§è¡Œæµç¨‹ï¼š
+ * 1. æ¯å‘é€ä¸€ä¸ªå­—èŠ‚ä¹‹å‰ï¼Œå…ˆç­‰å¾… TXE ç½®ä½
+ * 2. TXE ç½®ä½è¡¨ç¤ºå‘é€æ•°æ®å¯„å­˜å™¨ä¸ºç©ºï¼Œå¯ä»¥ç»§ç»­å†™å…¥ä¸‹ä¸€ä¸ªå­—èŠ‚
+ * 3. æ‰€æœ‰å­—èŠ‚å†™å…¥å®ŒæˆåŽï¼Œå†ç­‰å¾… TC ç½®ä½
+ * 4. TC ç½®ä½è¡¨ç¤ºæœ€åŽä¸€ä¸ªå­—èŠ‚å·²ä»Žç§»ä½å¯„å­˜å™¨å®Œæ•´å‘é€åˆ°æ€»çº¿
+ * æ³¨æ„ï¼š
+ * 1. æœ¬å‡½æ•°æ˜¯å¿™ç­‰å¾…å®žçŽ°ï¼Œå‘é€æœŸé—´ CPU ä¼šä¸€ç›´åœç•™åœ¨è½®è¯¢å¾ªçŽ¯ä¸­
+ * 2. è‹¥åº•å±‚ä¸²å£ç¡¬ä»¶å¼‚å¸¸æˆ–æ—¶é’Ÿé…ç½®é”™è¯¯ï¼Œç†è®ºä¸Šå¯èƒ½ä¸€ç›´å¡åœ¨ç­‰å¾…æ ‡å¿—ä½çš„å¾ªçŽ¯é‡Œ
+ */
+void my_USART_SendBytes(USART_TypeDef *USARTx, uint8_t *pData, uint8_t size)
+{
+    for (uint8_t i = 0; i < size; i++)
     {
-        if (--timeout == 0)
-            return EOF;
+        /* ç­‰å¾… TXE=1
+         * TXE è¡¨ç¤ºå‘é€æ•°æ®å¯„å­˜å™¨ä¸ºç©ºï¼Œè¯´æ˜Žå½“å‰å¯ä»¥å®‰å…¨å†™å…¥ä¸€ä¸ªæ–°å­—èŠ‚
+         */
+        while (USART_GetFlagStatus(USARTx, USART_FLAG_TXE) == RESET)
+            ;
+
+        /* å°†å½“å‰å­—èŠ‚å†™å…¥ USART æ•°æ®å¯„å­˜å™¨
+         * å†™å…¥åŽç¡¬ä»¶ä¼šè‡ªåŠ¨å¼€å§‹å‘é€ï¼Œæ— éœ€è½¯ä»¶å†æ‰‹åŠ¨è§¦å‘
+         */
+        USART_SendData(USARTx, pData[i]);
     }
 
-    USART_SendData(USART1, (uint16_t)(uint8_t)ch);
+    /* ç­‰å¾… TC=1
+     * è¿™é‡Œåªç­‰å¾… TXE è¿˜ä¸å¤Ÿï¼Œå› ä¸º TXE åªè¡¨ç¤ºæ•°æ®å¯„å­˜å™¨ç©ºï¼Œä¸ä»£è¡¨æœ€åŽä¸€ä½å·²ç»å‘å‡º
+     * ç­‰åˆ° TC ç½®ä½åŽå†è¿”å›žï¼Œæ‰èƒ½ç¡®ä¿æ•´å¸§æ•°æ®å·²ç»çœŸæ­£ç¦»å¼€å‘é€å¼•è„š
+     */
+    while (USART_GetFlagStatus(USARTx, USART_FLAG_TC) == RESET)
+        ;
+}
 
-    /* ²»±ØÃ¿¸ö×Ö·û¶¼µÈ´ý TC£¬ÌáÉý printf Êä³öÐ§ÂÊ */
-    return ch;
+void my_USART1_Init(void)
+{
+    /* 1. ä½¿èƒ½ AFIO æ—¶é’Ÿå¹¶é…ç½® USART1 é‡æ˜ å°„ï¼ˆä½¿ç”¨ PB6/PB7ï¼‰ */
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+    GPIO_PinRemapConfig(GPIO_Remap_USART1, ENABLE);
+
+    /* 2. ä½¿èƒ½ GPIOB æ—¶é’Ÿ */
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+
+    /* 3. é…ç½® TX å¼•è„š PB6ï¼ˆå¤ç”¨æŽ¨æŒ½è¾“å‡ºï¼‰ */
+    GPIO_InitTypeDef gpio_initStruct = {0};
+    gpio_initStruct.GPIO_Pin = GPIO_Pin_6;
+    gpio_initStruct.GPIO_Mode = GPIO_Mode_AF_PP;
+    gpio_initStruct.GPIO_Speed = GPIO_Speed_10MHz;
+    GPIO_Init(GPIOB, &gpio_initStruct);
+
+    /* 4. é…ç½® RX å¼•è„š PB7ï¼ˆä¸Šæ‹‰è¾“å…¥ï¼‰ */
+    gpio_initStruct.GPIO_Pin = GPIO_Pin_7;
+    gpio_initStruct.GPIO_Mode = GPIO_Mode_IPU;
+    GPIO_Init(GPIOB, &gpio_initStruct);
+
+    /* 5. ä½¿èƒ½ USART1 å¤–è®¾æ—¶é’Ÿ */
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+
+    /* 6. é…ç½® USART1 å‚æ•°ï¼ˆ115200, 8N1ï¼‰ */
+    USART_InitTypeDef usart_initStruct = {0};
+    usart_initStruct.USART_BaudRate = 115200;
+    usart_initStruct.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+    usart_initStruct.USART_WordLength = USART_WordLength_8b;
+    usart_initStruct.USART_StopBits = USART_StopBits_1;
+    usart_initStruct.USART_Parity = USART_Parity_No;
+    USART_Init(USART1, &usart_initStruct);
+
+    /* 7. ä½¿èƒ½ USART1 */
+    USART_Cmd(USART1, ENABLE);
 }
