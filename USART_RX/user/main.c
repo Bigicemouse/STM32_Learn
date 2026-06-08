@@ -20,7 +20,7 @@ int main(void)
     {
         /* 轮询等待接收数据寄存器非空 */
         while (USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == RESET);  
-        //发送数据空吗---不空---有数据正在传输---进入循环等待
+        //接收数据寄存器空吗---不空---有数据正在传输---进入循环等待   
 
         /* 读取 1 字节接收数据 */
         uint8_t receiveData = USART_ReceiveData(USART1);

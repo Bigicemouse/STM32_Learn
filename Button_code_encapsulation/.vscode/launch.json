@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "cwd": "${workspaceFolder}",
+            "type": "cortex-debug",
+            "request": "launch",
+            "name": "stlink-gdbserver",
+            "servertype": "stlink",
+            "interface": "swd",
+            "device": "STM32F103C8",
+            "executable": "${workspaceFolder}/build/default/Button_code_encapsulation.axf",
+            "runToEntryPoint": "main",
+            "armToolchainPath": "C:/software/Keilv5/Core/ARM/ARMCC/bin"
+        }
+    ]
+}

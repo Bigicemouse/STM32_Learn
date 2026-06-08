@@ -28,6 +28,14 @@ Open the `.uvprojx` file in Keil uVision. Build target is configured for:
 ### Option 2: VS Code + EIDE Extension
 Open the `.code-workspace` file. Requires the EIDE extension (recommended extensions are listed in workspace file). Build via EIDE commands.
 
+### Local EIDE/AC5 Toolchain Notes
+
+- EIDE projects may use target `default` with toolchain `AC5`.
+- The local ARMCC5 compiler path can be `C:\software\Keilv5\Core\ARM\ARMCC\bin\armcc.exe`.
+- If `armcc` is not available on `PATH`, inspect `.eide/eide.yml`, `build/<target>/builder.params`, or `build/<target>/compile_commands.json`, then invoke the absolute compiler path.
+- EIDE's `unify_builder.exe` may require `.NET 6.0.0`. If the machine only has a newer .NET runtime, the builder can fail before invoking ARMCC; use a focused ARMCC5 compile command for the edited source file when full EIDE CLI build is blocked.
+- In `Button_code_encapsulation`, `user/main.c` and `user/stm32f10x_it.c` were verified with ARM Compiler 5.06 update 7 using EIDE's include paths and defines.
+
 ### Key Compiler Flags
 - `STM32F10X_MD` - Medium density device
 - `USE_STDPERIPH_DRIVER` - Enable Standard Peripheral Library
@@ -48,6 +56,7 @@ This removes build output (build/, Objects/, Listings/), Keil cache, and EIDE te
 - **API Style**: Use StdPeriph API consistently (e.g., `GPIO_InitTypeDef`, `USART_InitTypeDef`, `RCC_APB2PeriphClockCmd`)
 - **Don't mix**: HAL, LL, or CubeMX code styles into these projects
 - **Include paths**: `std_periph_driver/inc`, `user`, `my_lib`, `my_lib/font`, `.cmsis/include`
+- **注释风格**: 简单行内注释使用 `//`，函数/文件头部的文档注释使用 `/** */` 或 `/* */`。不要对简单注释使用 `/* */`
 
 ## Common Drivers (my_lib/)
 

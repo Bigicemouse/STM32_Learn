@@ -22,35 +22,33 @@ int main(void)
 
     // 将gpioa1设置为输入上拉
     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_1;
-    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPU;
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPU; // 默认高电平
     GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     // ---------------- 2. 主循环逻辑 ----------------
     while (1)
     {
+        // 按键状态检测（带消抖）
+        // 说明：PA1 配置为上拉输入，未按下时为高电平(1)，按下时接地为低电平(0)
 
-        // 读取按键状态
-        BitAction keyState = GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_1); // 读取PA1状态
-
-        if (keyState == Bit_RESET) // 按键按下时，PA1被拉低
+        if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_1) == Bit_RESET) // 检测到按键按下（低电平）
         {
-            Delay(20); // 机械按键去抖，延时20ms后再次确认
-            keyState = GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_1);
+            Delay(20); // 延时20ms消除机械抖动（典型按键抖动时间为5-20ms）
 
-            if (keyState == Bit_RESET) // 点亮LED
+            // 再次确认按键状态，排除干扰信号
+            if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_1) == Bit_RESET)
             {
-                GPIO_WriteBit(GPIOA, GPIO_Pin_0, Bit_SET);
-            }
-            else // 熄灭LED
-            {
-                GPIO_WriteBit(GPIOA, GPIO_Pin_0, Bit_RESET);
-            }
-        }
+                // 切换 LED 状态（按一下开，再按一下关）
+                // 读取当前 LED 状态，取反后写回
+                BitAction currentLed = GPIO_ReadOutputDataBit(GPIOA, GPIO_Pin_0);
+                GPIO_WriteBit(GPIOA, GPIO_Pin_0, (currentLed == Bit_RESET) ? Bit_SET : Bit_RESET);
 
-        // 熄灭LED
-        else
-        {
-            GPIO_WriteBit(GPIOA, GPIO_Pin_0, Bit_RESET);
+                // 等待按键释放，避免长按连续触发
+                while (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_1) == Bit_RESET)
+                {
+                    // 占位，直到松开按键
+                }
+            }
         }
     }
 }

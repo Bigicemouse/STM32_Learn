@@ -234,6 +234,6 @@ targets:
         otherCmds: ""
         proType: SWD
         resetMode: default
-        runAfterProgram: false
+        runAfterProgram: true
         speed: 4000
     uploader: STLink

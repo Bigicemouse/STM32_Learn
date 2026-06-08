@@ -21,6 +21,12 @@ code .\Serial_port_printf_String\Serial_port_printf_String.code-workspace
 
 Build from VS Code with the EIDE extension or from Keil uVision using the matching `.uvprojx`, for example `gpio_key/gpio_key.uvprojx`. Projects are configured for ARMCC5, Cortex-M3, `STM32F10X_MD`, and `USE_STDPERIPH_DRIVER`.
 
+Local EIDE/AC5 notes:
+- EIDE target `default` may use toolchain `AC5` with the compiler at `C:\software\Keilv5\Core\ARM\ARMCC\bin\armcc.exe`.
+- If `armcc` is not on `PATH`, read `build/<target>/compile_commands.json` or `.eide/eide.yml` and invoke the absolute ARMCC5 path directly.
+- EIDE's `unify_builder.exe` may require `.NET 6.0.0`; if only a newer .NET runtime is installed, command-line EIDE builds can fail before compilation. In that case, a narrow ARMCC5 compile check of the edited source file is still useful evidence.
+- For `Button_code_encapsulation`, `user/main.c` and `user/stm32f10x_it.c` were verified with ARM Compiler 5.06 update 7 using the EIDE include paths and defines.
+
 Use each project cleanup script before packaging or comparing generated output:
 
 ```powershell
@@ -32,6 +38,8 @@ Use each project cleanup script before packaging or comparing generated output:
 Use C with STM32 StdPeriph APIs; do not mix HAL, LL, or CubeMX styles into these projects. Keep initialization code in the existing struct/function style (`GPIO_InitTypeDef`, `USART_InitTypeDef`, `RCC_APB2PeriphClockCmd`, etc.).
 
 Follow the local `.clang-format`: Microsoft base style, 4-space indentation, no tabs, no include sorting, and no fixed column limit. Keep public helper APIs in `my_lib/*.h` stable unless the change explicitly requires an interface update.
+
+**Comment style**: Use `//` for simple inline comments. Use `/** */` or `/* */` only for function/file-level documentation comments.
 
 ## Testing Guidelines
 
