@@ -1,17 +1,20 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "cwd": "${workspaceFolder}",
-            "type": "cortex-debug",
-            "request": "launch",
-            "name": "stlink-gdbserver",
-            "servertype": "stlink",
-            "interface": "swd",
-            "device": "STM32F103C8",
-            "executable": "${workspaceFolder}/build/default/SPI.axf",
-            "runToEntryPoint": "main",
-            "armToolchainPath": "C:/software/Keilv5/Core/ARM/ARMCC/bin"
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "cwd": "${workspaceFolder}",
+      "type": "cortex-debug",
+      "request": "launch",
+      "name": "stlink-gdbserver",
+      "servertype": "stlink",
+      "interface": "swd",
+      "device": "STM32F103C8",
+      "executable": "${workspaceFolder}/build/default/SPI.axf",
+      "runToEntryPoint": "main",
+      "armToolchainPath": "C:/Users/Admin/.eide/tools/gcc_arm/bin",
+      "serverpath": "C:/software/ST/STM32CubeCLT_1.18.0/STLink-gdb-server/bin/ST-LINK_gdbserver.exe",
+      "stm32cubeprogrammer": "C:/software/ST/STM32CubeCLT_1.18.0/STM32CubeProgrammer/bin",
+      "preLaunchTask": "build"
+    }
+  ]
 }

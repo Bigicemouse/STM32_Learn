@@ -81,10 +81,16 @@ Use short imperative subjects: `Add Serial_port_printf_String folder`, `Replace 
 
 ## Projects
 
-- `BlinkyLED/` - Basic GPIO LED blinking example
-- `gpio_key/` - Button input with GPIO
-- `Serial_port_printf_String/` - USART printf output example
-- `UART_Comm/` - UART communication
-- `USART_RX/` - USART receive with LED control
-- `OLED/` - OLED display interface
+- `BlinkyLED/` - Basic GPIO LED blinking on PC13 (empty-loop delay)
+- `Clock_Tree/` - Clock tree configuration and LED blink with manual delay
+- `gpio_key/` - Button input with GPIO, basic debounce logic
+- `Button_code_encapsulation/` - Button driver with click, double-click, and long-press callbacks
+- `Serial_port_printf_String/` - USART1 initialization and `printf` retargeting
+- `UART_Comm/` - USART1 send/receive loopback
+- `USART_RX/` - USART receive to control LED (character and raw byte commands)
+- `Interrupt_learn/` - USART receive interrupt to control LED blink rate
+- `Exti/` - EXTI external interrupt: two buttons control LED on/off
+- `Timer/` - TIM3 timer interrupt for precise 1ms delay, LED blink
+- `OLED_I2C/` - I2C-driven OLED display with mixed Chinese/English text
+- `SPI/` - SPI1 full-duplex master send/receive (pin remap)
 - `stm32f103_stdperiph_template/` - Base template for new projects
