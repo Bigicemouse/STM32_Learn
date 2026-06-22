@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="I2C 整体详细解读">
+<style><![CDATA[
+
+    svg {
+      --navy: #0b2d75;
+      --blue: #1b5fc9;
+      --green: #087a4a;
+      --green2: #0b8f5a;
+      --line: #9bb2d9;
+      --pale: #f6f9ff;
+      --pale-green: #eefaf2;
+      --pale-red: #fff2f2;
+      --red: #d12b2b;
+      --orange: #ce7a08;
+      --ink: #17213b;
+      --muted: #51617d;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #dfe7f5;
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+    }
+
+    .deck {
+      width: 1600px;
+      margin: 0 auto;
+      padding: 18px 0 36px;
+    }
+
+    .page {
+      width: 1600px;
+      height: 900px;
+      margin: 0 0 28px;
+      background: #fff;
+      border: 1px solid #b8c8e7;
+      box-shadow: 0 8px 28px rgba(11, 45, 117, .18);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .page svg {
+      display: block;
+      width: 1600px;
+      height: 900px;
+    }
+
+    .title {
+      font-size: 34px;
+      font-weight: 800;
+      fill: #fff;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      font-weight: 600;
+      fill: #dce8ff;
+    }
+
+    .label {
+      font-size: 18px;
+      fill: var(--ink);
+    }
+
+    .small {
+      font-size: 15px;
+      fill: var(--muted);
+    }
+
+    .tiny {
+      font-size: 13px;
+      fill: var(--muted);
+    }
+
+    .card-title {
+      font-size: 22px;
+      font-weight: 800;
+      fill: #fff;
+    }
+
+    .box-title {
+      font-size: 20px;
+      font-weight: 800;
+      fill: var(--navy);
+    }
+
+    .mono {
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 16px;
+      fill: var(--ink);
+    }
+
+    .mono-small {
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 13px;
+      fill: var(--ink);
+    }
+
+    .step-num {
+      font-size: 16px;
+      font-weight: 800;
+      fill: #fff;
+    }
+
+    .flag {
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 17px;
+      font-weight: 800;
+      fill: var(--blue);
+    }
+
+    .warn {
+      fill: var(--red);
+      font-weight: 800;
+    }
+
+    .ok {
+      fill: var(--green);
+      font-weight: 800;
+    }
+  
+]]></style>
+        <defs>
+          <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#1b5fc9"/>
+          </marker>
+          <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#087a4a"/>
+          </marker>
+          <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#d12b2b"/>
+          </marker>
+          <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#17366f" flood-opacity=".16"/>
+          </filter>
+        </defs>
+
+        <rect x="0" y="0" width="1600" height="900" fill="#f5f8ff"/>
+        <rect x="0" y="0" width="1600" height="70" fill="#0b2d75"/>
+        <text x="800" y="44" text-anchor="middle" class="title">I2C 整体详细解读：协议规则 + 地址 + 两套代码实现</text>
+        <text x="800" y="64" text-anchor="middle" class="subtitle">先分清协议本身，再分清硬件 I2C 状态机和软件 I2C GPIO 电平时序</text>
+
+        <rect x="28" y="100" width="390" height="250" rx="8" fill="#ffffff" stroke="#9bb2d9" filter="url(#shadow)"/>
+        <rect x="28" y="100" width="260" height="38" rx="6" fill="#087a4a"/>
+        <text x="48" y="126" class="card-title">1. 协议电平规则</text>
+        <text x="54" y="168" class="label">空闲：SCL=1，SDA=1</text>
+        <text x="54" y="202" class="label">START：SCL 高时，SDA 1->0</text>
+        <text x="54" y="236" class="label">STOP：SCL 高时，SDA 0->1</text>
+        <text x="54" y="270" class="label">数据：SCL 低改 SDA，SCL 高采样</text>
+        <text x="54" y="304" class="label">第 9 位：ACK/NACK，不是数据位</text>
+        <text x="54" y="334" class="label warn">协议电平：SDA=0 -> ACK，SDA=1 -> NACK</text>
+
+        <rect x="448" y="100" width="390" height="250" rx="8" fill="#ffffff" stroke="#9bb2d9" filter="url(#shadow)"/>
+        <rect x="448" y="100" width="260" height="38" rx="6" fill="#0b8f5a"/>
+        <text x="468" y="126" class="card-title">2. 地址统一标注</text>
+        <text x="474" y="170" class="label">7位地址 <tspan class="flag">Addr7</tspan></text>
+        <text x="474" y="206" class="mono">函数参数 Addr = Addr7 &lt;&lt; 1</text>
+        <text x="474" y="242" class="mono">写地址字节 = Addr &amp; 0xFE</text>
+        <text x="474" y="278" class="mono">读地址字节 = Addr | 0x01</text>
+        <text x="474" y="320" class="small">例：Addr7=0x3C -> Addr=0x78，写=0x78，读=0x79</text>
+
+        <rect x="868" y="100" width="702" height="250" rx="8" fill="#ffffff" stroke="#9bb2d9" filter="url(#shadow)"/>
+        <rect x="868" y="100" width="300" height="38" rx="6" fill="#ce7a08"/>
+        <text x="888" y="126" class="card-title">3. 寄存器读单独画</text>
+        <text x="894" y="168" class="label">寄存器型器件读数据时，不要把“直接读”和“先写寄存器地址”混成一条。</text>
+        <g transform="translate(900 205)">
+          <rect x="0" y="0" width="94" height="48" rx="6" fill="#eefaf2" stroke="#087a4a"/>
+          <text x="47" y="30" text-anchor="middle" class="flag">START</text>
+          <line x1="94" y1="24" x2="132" y2="24" stroke="#1b5fc9" stroke-width="3" marker-end="url(#arrow-blue)"/>
+          <rect x="132" y="0" width="118" height="48" rx="6" fill="#f6f9ff" stroke="#1b5fc9"/>
+          <text x="191" y="30" text-anchor="middle" class="flag">Addr+W</text>
+          <line x1="250" y1="24" x2="288" y2="24" stroke="#1b5fc9" stroke-width="3" marker-end="url(#arrow-blue)"/>
+          <rect x="288" y="0" width="118" height="48" rx="6" fill="#f6f9ff" stroke="#1b5fc9"/>
+          <text x="347" y="30" text-anchor="middle" class="flag">RegAddr</text>
+          <line x1="406" y1="24" x2="444" y2="24" stroke="#1b5fc9" stroke-width="3" marker-end="url(#arrow-blue)"/>
+          <rect x="444" y="0" width="112" height="48" rx="6" fill="#fff2f2" stroke="#d12b2b"/>
+          <text x="500" y="30" text-anchor="middle" class="flag warn">ReSTART</text>
+          <line x1="556" y1="24" x2="594" y2="24" stroke="#1b5fc9" stroke-width="3" marker-end="url(#arrow-blue)"/>
+          <rect x="594" y="0" width="118" height="48" rx="6" fill="#f6f9ff" stroke="#1b5fc9"/>
+          <text x="653" y="30" text-anchor="middle" class="flag">Addr+R</text>
+          <line x1="280" y1="82" x2="320" y2="82" stroke="#1b5fc9" stroke-width="3" marker-end="url(#arrow-blue)"/>
+          <rect x="0" y="58" width="240" height="48" rx="6" fill="#fff8ec" stroke="#ce7a08"/>
+          <text x="120" y="88" text-anchor="middle" class="flag">Data... -> NACK -> STOP</text>
+          <path d="M 712 24 C 760 24, 760 82, 250 82" fill="none" stroke="#1b5fc9" stroke-width="3" marker-end="url(#arrow-blue)"/>
+        </g>
+
+        <rect x="28" y="386" width="740" height="330" rx="8" fill="#ffffff" stroke="#9bb2d9" filter="url(#shadow)"/>
+        <rect x="28" y="386" width="350" height="40" rx="6" fill="#0b2d75"/>
+        <text x="48" y="413" class="card-title">硬件 I2C 图：状态机 / 标志位流程</text>
+        <text x="54" y="462" class="label">代码依据：<tspan class="mono">my_lib/i2c.c</tspan></text>
+        <text x="54" y="500" class="label">外设自己产生 SCL/SDA 时序，代码通过状态位推进。</text>
+        <g transform="translate(58 532)">
+          <rect x="0" y="0" width="96" height="44" rx="6" fill="#eaf1ff" stroke="#1b5fc9"/>
+          <text x="48" y="28" text-anchor="middle" class="flag">BUSY</text>
+          <line x1="96" y1="22" x2="134" y2="22" stroke="#1b5fc9" stroke-width="3" marker-end="url(#arrow-blue)"/>
+          <rect x="134" y="0" width="80" height="44" rx="6" fill="#eaf1ff" stroke="#1b5fc9"/>
+          <text x="174" y="28" text-anchor="middle" class="flag">SB</text>
+          <line x1="214" y1="22" x2="252" y2="22" stroke="#1b5fc9" stroke-width="3" marker-end="url(#arrow-blue)"/>
+          <rect x="252" y="0" width="96" height="44" rx="6" fill="#eaf1ff" stroke="#1b5fc9"/>
+          <text x="300" y="28" text-anchor="middle" class="flag">ADDR</text>
+          <line x1="348" y1="22" x2="386" y2="22" stroke="#1b5fc9" stroke-width="3" marker-end="url(#arrow-blue)"/>
+          <rect x="386" y="0" width="80" height="44" rx="6" fill="#fff2f2" stroke="#d12b2b"/>
+          <text x="426" y="28" text-anchor="middle" class="flag warn">AF</text>
+          <line x1="466" y1="22" x2="504" y2="22" stroke="#1b5fc9" stroke-width="3" marker-end="url(#arrow-blue)"/>
+          <rect x="504" y="0" width="80" height="44" rx="6" fill="#eaf1ff" stroke="#1b5fc9"/>
+          <text x="544" y="28" text-anchor="middle" class="flag">TXE</text>
+          <line x1="584" y1="22" x2="622" y2="22" stroke="#1b5fc9" stroke-width="3" marker-end="url(#arrow-blue)"/>
+          <rect x="622" y="0" width="80" height="44" rx="6" fill="#eaf1ff" stroke="#1b5fc9"/>
+          <text x="662" y="28" text-anchor="middle" class="flag">BTF</text>
+        </g>
+        <text x="54" y="638" class="label">写：BUSY -> START/SB -> Addr+W/ADDR -> TXE循环 -> BTF -> STOP</text>
+        <text x="54" y="678" class="label">读：BUSY -> START/SB -> Addr+R/ADDR -> ACK位控制 -> RXNE -> STOP</text>
+
+        <rect x="798" y="386" width="772" height="330" rx="8" fill="#ffffff" stroke="#9bb2d9" filter="url(#shadow)"/>
+        <rect x="798" y="386" width="330" height="40" rx="6" fill="#087a4a"/>
+        <text x="818" y="413" class="card-title">软件 I2C 图：GPIO 电平时序</text>
+        <text x="824" y="462" class="label">代码依据：<tspan class="mono">my_lib/si2c.c</tspan></text>
+        <text x="824" y="500" class="label">GPIO 开漏模拟 I2C，图上必须直接标函数动作。</text>
+        <g transform="translate(828 532)">
+          <rect x="0" y="0" width="120" height="46" rx="6" fill="#eefaf2" stroke="#087a4a"/>
+          <text x="60" y="29" text-anchor="middle" class="flag ok">scl_w(0)</text>
+          <line x1="120" y1="23" x2="158" y2="23" stroke="#087a4a" stroke-width="3" marker-end="url(#arrow-green)"/>
+          <rect x="158" y="0" width="128" height="46" rx="6" fill="#eefaf2" stroke="#087a4a"/>
+          <text x="222" y="29" text-anchor="middle" class="flag ok">sda_w(bit)</text>
+          <line x1="286" y1="23" x2="324" y2="23" stroke="#087a4a" stroke-width="3" marker-end="url(#arrow-green)"/>
+          <rect x="324" y="0" width="110" height="46" rx="6" fill="#fff8ec" stroke="#ce7a08"/>
+          <text x="379" y="29" text-anchor="middle" class="flag">delay()</text>
+          <line x1="434" y1="23" x2="472" y2="23" stroke="#087a4a" stroke-width="3" marker-end="url(#arrow-green)"/>
+          <rect x="472" y="0" width="120" height="46" rx="6" fill="#eefaf2" stroke="#087a4a"/>
+          <text x="532" y="29" text-anchor="middle" class="flag ok">scl_w(1)</text>
+        </g>
+        <text x="824" y="638" class="label">发送 1 字节：8 位数据 + 第 9 位读 <tspan class="flag">sda_r</tspan> 得 ACK/NACK。</text>
+        <text x="824" y="678" class="label">接收 1 字节：释放 SDA 后读 <tspan class="flag">sda_r</tspan>，再由主机用 <tspan class="flag">sda_w(0/1)</tspan> 回 ACK/NACK。</text>
+
+        <rect x="28" y="744" width="1542" height="86" rx="8" fill="#fff2f2" stroke="#d12b2b"/>
+        <text x="54" y="782" class="label warn">不要混画：</text>
+        <text x="170" y="782" class="label">硬件图画“寄存器状态机和标志位”；软件图画“GPIO 引脚电平和 delay 时序”。</text>
+        <text x="54" y="816" class="label">统一 ACK/NACK：协议电平 SDA=0 -> ACK，SDA=1 -> NACK；当前代码参数 Ack=1 -> 发送 ACK，Ack=0 -> 发送 NACK。</text>
+      </svg>

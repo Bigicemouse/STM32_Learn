@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="硬件 I2C 读流程和寄存器读组合">
+<style><![CDATA[
+
+    svg {
+      --navy: #0b2d75;
+      --blue: #1b5fc9;
+      --green: #087a4a;
+      --green2: #0b8f5a;
+      --line: #9bb2d9;
+      --pale: #f6f9ff;
+      --pale-green: #eefaf2;
+      --pale-red: #fff2f2;
+      --red: #d12b2b;
+      --orange: #ce7a08;
+      --ink: #17213b;
+      --muted: #51617d;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #dfe7f5;
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+    }
+
+    .deck {
+      width: 1600px;
+      margin: 0 auto;
+      padding: 18px 0 36px;
+    }
+
+    .page {
+      width: 1600px;
+      height: 900px;
+      margin: 0 0 28px;
+      background: #fff;
+      border: 1px solid #b8c8e7;
+      box-shadow: 0 8px 28px rgba(11, 45, 117, .18);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .page svg {
+      display: block;
+      width: 1600px;
+      height: 900px;
+    }
+
+    .title {
+      font-size: 34px;
+      font-weight: 800;
+      fill: #fff;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      font-weight: 600;
+      fill: #dce8ff;
+    }
+
+    .label {
+      font-size: 18px;
+      fill: var(--ink);
+    }
+
+    .small {
+      font-size: 15px;
+      fill: var(--muted);
+    }
+
+    .tiny {
+      font-size: 13px;
+      fill: var(--muted);
+    }
+
+    .card-title {
+      font-size: 22px;
+      font-weight: 800;
+      fill: #fff;
+    }
+
+    .box-title {
+      font-size: 20px;
+      font-weight: 800;
+      fill: var(--navy);
+    }
+
+    .mono {
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 16px;
+      fill: var(--ink);
+    }
+
+    .mono-small {
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 13px;
+      fill: var(--ink);
+    }
+
+    .step-num {
+      font-size: 16px;
+      font-weight: 800;
+      fill: #fff;
+    }
+
+    .flag {
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 17px;
+      font-weight: 800;
+      fill: var(--blue);
+    }
+
+    .warn {
+      fill: var(--red);
+      font-weight: 800;
+    }
+
+    .ok {
+      fill: var(--green);
+      font-weight: 800;
+    }
+  
+]]></style>
+        <defs>
+          <marker id="arrow-read" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#1b5fc9"/>
+          </marker>
+          <marker id="arrow-reg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#ce7a08"/>
+          </marker>
+        </defs>
+        <rect x="0" y="0" width="1600" height="900" fill="#f6f9ff"/>
+        <rect x="0" y="0" width="1600" height="72" fill="#0b2d75"/>
+        <text x="800" y="45" text-anchor="middle" class="title">硬件 I2C 图 2：状态机 / 标志位流程 - My_I2C_ReceiveBytes()</text>
+        <text x="800" y="66" text-anchor="middle" class="subtitle">重点看 RXNE、ACK 位、STOP 位；寄存器读必须单独画 Addr+W -> RegAddr -> ReSTART</text>
+
+        <rect x="26" y="96" width="1538" height="510" rx="8" fill="#ffffff" stroke="#9bb2d9"/>
+        <rect x="48" y="118" width="350" height="38" rx="6" fill="#0b2d75"/>
+        <text x="68" y="144" class="card-title">直接读流程：My_I2C_ReceiveBytes()</text>
+
+        <g transform="translate(58 184)">
+          <rect x="0" y="0" width="190" height="60" rx="8" fill="#eaf1ff" stroke="#1b5fc9"/>
+          <text x="95" y="25" text-anchor="middle" class="box-title">BUSY=0</text>
+          <text x="95" y="48" text-anchor="middle" class="mono-small">总线空闲</text>
+          <line x1="190" y1="30" x2="238" y2="30" stroke="#1b5fc9" stroke-width="3" marker-end="url(#arrow-read)"/>
+
+          <rect x="238" y="0" width="210" height="60" rx="8" fill="#eaf1ff" stroke="#1b5fc9"/>
+          <text x="343" y="25" text-anchor="middle" class="box-title">START -> SB</text>
+          <text x="343" y="48" text-anchor="middle" class="mono-small">等 I2C_FLAG_SB</text>
+          <line x1="448" y1="30" x2="496" y2="30" stroke="#1b5fc9" stroke-width="3" marker-end="url(#arrow-read)"/>
+
+          <rect x="496" y="0" width="220" height="60" rx="8" fill="#f6f9ff" stroke="#1b5fc9"/>
+          <text x="606" y="25" text-anchor="middle" class="box-title">发读地址</text>
+          <text x="606" y="48" text-anchor="middle" class="mono-small">Addr | 0x01</text>
+          <line x1="716" y1="30" x2="764" y2="30" stroke="#1b5fc9" stroke-width="3" marker-end="url(#arrow-read)"/>
+
+          <rect x="764" y="0" width="230" height="60" rx="8" fill="#fff8ec" stroke="#ce7a08"/>
+          <text x="879" y="25" text-anchor="middle" class="box-title">ADDR 或 AF</text>
+          <text x="879" y="48" text-anchor="middle" class="mono-small">ADDR 成功，AF 失败</text>
+          <line x1="994" y1="30" x2="1042" y2="30" stroke="#1b5fc9" stroke-width="3" marker-end="url(#arrow-read)"/>
+
+          <rect x="1042" y="0" width="230" height="60" rx="8" fill="#fff8ec" stroke="#ce7a08"/>
+          <text x="1157" y="25" text-anchor="middle" class="box-title">按 Size 分支</text>
+          <text x="1157" y="48" text-anchor="middle" class="mono-small">1 字节 / 多字节</text>
+        </g>
+
+        <g transform="translate(70 296)">
+          <rect x="0" y="0" width="692" height="242" rx="8" fill="#fff8ec" stroke="#ce7a08" stroke-width="2"/>
+          <rect x="18" y="18" width="210" height="34" rx="6" fill="#ce7a08"/>
+          <text x="34" y="42" class="card-title">Size == 1</text>
+          <text x="28" y="84" class="label">1. 先关 ACK：<tspan class="mono">I2C_AcknowledgeConfig(DISABLE)</tspan></text>
+          <text x="28" y="124" class="label">2. 关中断，读 <tspan class="flag">SR1 + SR2</tspan> 清 ADDR</text>
+          <text x="28" y="164" class="label">3. 立即置 <tspan class="flag warn">STOP位</tspan>，再开中断</text>
+          <text x="28" y="204" class="label">4. 等 <tspan class="flag">RXNE=1</tspan>，读最后 1 字节</text>
+          <text x="410" y="84" class="label warn">ACK位=0 -> 主机最后回 NACK</text>
+          <text x="410" y="124" class="small">防止从机继续发送后续字节</text>
+        </g>
+
+        <g transform="translate(792 296)">
+          <rect x="0" y="0" width="718" height="242" rx="8" fill="#eefaf2" stroke="#087a4a" stroke-width="2"/>
+          <rect x="18" y="18" width="230" height="34" rx="6" fill="#087a4a"/>
+          <text x="34" y="42" class="card-title">Size &gt; 1</text>
+          <text x="28" y="84" class="label">1. 开 ACK：<tspan class="mono">I2C_AcknowledgeConfig(ENABLE)</tspan></text>
+          <text x="28" y="124" class="label">2. 读 <tspan class="flag">SR1 + SR2</tspan> 清 ADDR</text>
+          <text x="28" y="164" class="label">3. 前 N-1 字节：等 <tspan class="flag">RXNE=1</tspan> 后读 DR</text>
+          <text x="28" y="204" class="label">4. 最后字节前关 ACK，置 <tspan class="flag warn">STOP位</tspan>，再读最后字节</text>
+          <text x="468" y="84" class="label warn">最后一字节前：ACK位=0</text>
+          <text x="468" y="124" class="small">中断保护用于避免 STOP 时序被打断</text>
+        </g>
+
+        <rect x="26" y="630" width="1538" height="236" rx="8" fill="#ffffff" stroke="#9bb2d9"/>
+        <rect x="48" y="652" width="320" height="38" rx="6" fill="#ce7a08"/>
+        <text x="68" y="678" class="card-title">寄存器读：单独一条流程</text>
+        <text x="392" y="678" class="label">适合温度传感器、MPU6050、OLED 控制器等“先写寄存器地址，再读数据”的器件。</text>
+
+        <g transform="translate(78 730)">
+          <rect x="0" y="0" width="110" height="54" rx="6" fill="#eefaf2" stroke="#087a4a"/>
+          <text x="55" y="33" text-anchor="middle" class="flag">START</text>
+          <line x1="110" y1="27" x2="148" y2="27" stroke="#ce7a08" stroke-width="3" marker-end="url(#arrow-reg)"/>
+          <rect x="148" y="0" width="132" height="54" rx="6" fill="#f6f9ff" stroke="#1b5fc9"/>
+          <text x="214" y="33" text-anchor="middle" class="flag">Addr+W</text>
+          <line x1="280" y1="27" x2="318" y2="27" stroke="#ce7a08" stroke-width="3" marker-end="url(#arrow-reg)"/>
+          <rect x="318" y="0" width="132" height="54" rx="6" fill="#f6f9ff" stroke="#1b5fc9"/>
+          <text x="384" y="33" text-anchor="middle" class="flag">RegAddr</text>
+          <line x1="450" y1="27" x2="488" y2="27" stroke="#ce7a08" stroke-width="3" marker-end="url(#arrow-reg)"/>
+          <rect x="488" y="0" width="122" height="54" rx="6" fill="#fff2f2" stroke="#d12b2b"/>
+          <text x="549" y="33" text-anchor="middle" class="flag warn">ReSTART</text>
+          <line x1="610" y1="27" x2="648" y2="27" stroke="#ce7a08" stroke-width="3" marker-end="url(#arrow-reg)"/>
+          <rect x="648" y="0" width="132" height="54" rx="6" fill="#f6f9ff" stroke="#1b5fc9"/>
+          <text x="714" y="33" text-anchor="middle" class="flag">Addr+R</text>
+          <line x1="780" y1="27" x2="818" y2="27" stroke="#ce7a08" stroke-width="3" marker-end="url(#arrow-reg)"/>
+          <rect x="818" y="0" width="132" height="54" rx="6" fill="#eaf1ff" stroke="#1b5fc9"/>
+          <text x="884" y="33" text-anchor="middle" class="flag">Data...</text>
+          <line x1="950" y1="27" x2="988" y2="27" stroke="#ce7a08" stroke-width="3" marker-end="url(#arrow-reg)"/>
+          <rect x="988" y="0" width="112" height="54" rx="6" fill="#fff2f2" stroke="#d12b2b"/>
+          <text x="1044" y="33" text-anchor="middle" class="flag warn">NACK</text>
+          <line x1="1100" y1="27" x2="1138" y2="27" stroke="#ce7a08" stroke-width="3" marker-end="url(#arrow-reg)"/>
+          <rect x="1138" y="0" width="110" height="54" rx="6" fill="#eefaf2" stroke="#087a4a"/>
+          <text x="1193" y="33" text-anchor="middle" class="flag">STOP</text>
+        </g>
+
+        <text x="78" y="812" class="label warn">统一链路：</text>
+        <text x="168" y="812" class="label">START -> Addr+W -> RegAddr -> ReSTART -> Addr+R -> Data... -> NACK -> STOP</text>
+        <text x="78" y="846" class="label warn">注意：</text>
+        <text x="134" y="846" class="label">当前 <tspan class="mono">My_I2C_ReceiveBytes()</tspan> 只做“Addr+R 后直接读”；如果要严格 ReSTART，需要专门组合读函数或手写外层状态机。</text>
+      </svg>
