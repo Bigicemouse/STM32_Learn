@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="软件 I2C SendByte 和 Stop GPIO 电平时序">
+<style><![CDATA[
+
+    svg {
+      --navy: #0b2d75;
+      --blue: #1b5fc9;
+      --green: #087a4a;
+      --green2: #0b8f5a;
+      --line: #9bb2d9;
+      --pale: #f6f9ff;
+      --pale-green: #eefaf2;
+      --pale-red: #fff2f2;
+      --red: #d12b2b;
+      --orange: #ce7a08;
+      --ink: #17213b;
+      --muted: #51617d;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #dfe7f5;
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+    }
+
+    .deck {
+      width: 1600px;
+      margin: 0 auto;
+      padding: 18px 0 36px;
+    }
+
+    .page {
+      width: 1600px;
+      height: 900px;
+      margin: 0 0 28px;
+      background: #fff;
+      border: 1px solid #b8c8e7;
+      box-shadow: 0 8px 28px rgba(11, 45, 117, .18);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .page svg {
+      display: block;
+      width: 1600px;
+      height: 900px;
+    }
+
+    .title {
+      font-size: 34px;
+      font-weight: 800;
+      fill: #fff;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      font-weight: 600;
+      fill: #dce8ff;
+    }
+
+    .label {
+      font-size: 18px;
+      fill: var(--ink);
+    }
+
+    .small {
+      font-size: 15px;
+      fill: var(--muted);
+    }
+
+    .tiny {
+      font-size: 13px;
+      fill: var(--muted);
+    }
+
+    .card-title {
+      font-size: 22px;
+      font-weight: 800;
+      fill: #fff;
+    }
+
+    .box-title {
+      font-size: 20px;
+      font-weight: 800;
+      fill: var(--navy);
+    }
+
+    .mono {
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 16px;
+      fill: var(--ink);
+    }
+
+    .mono-small {
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 13px;
+      fill: var(--ink);
+    }
+
+    .step-num {
+      font-size: 16px;
+      font-weight: 800;
+      fill: #fff;
+    }
+
+    .flag {
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 17px;
+      font-weight: 800;
+      fill: var(--blue);
+    }
+
+    .warn {
+      fill: var(--red);
+      font-weight: 800;
+    }
+
+    .ok {
+      fill: var(--green);
+      font-weight: 800;
+    }
+  
+]]></style>
+        <defs>
+          <marker id="arrow-sw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#087a4a"/>
+          </marker>
+        </defs>
+        <rect x="0" y="0" width="1600" height="900" fill="#f6f9ff"/>
+        <rect x="0" y="0" width="1600" height="72" fill="#0b2d75"/>
+        <text x="800" y="45" text-anchor="middle" class="title">软件 I2C 图 1：GPIO 电平时序 - SendByte() + SendStop()</text>
+        <text x="800" y="66" text-anchor="middle" class="subtitle">重点标 scl_w(0/1)、sda_w(0/1)、sda_r、delay()；主机用 GPIO 开漏模拟协议</text>
+
+        <rect x="26" y="94" width="610" height="230" rx="8" fill="#ffffff" stroke="#9bb2d9"/>
+        <rect x="48" y="116" width="240" height="38" rx="6" fill="#087a4a"/>
+        <text x="68" y="142" class="card-title">真实总线电气模型</text>
+        <text x="58" y="190" class="label"><tspan class="mono">sda_w(0)</tspan>：GPIO 强拉低 SDA。</text>
+        <text x="58" y="226" class="label"><tspan class="mono">sda_w(1)</tspan>：开漏释放 SDA，由上拉或从机决定电平。</text>
+        <text x="58" y="262" class="label"><tspan class="mono">sda_r</tspan>：读 SDA；第 9 位读到 0 是 ACK，读到 1 是 NACK。</text>
+        <text x="58" y="298" class="label"><tspan class="mono">delay()</tspan>：给建立时间、保持时间和采样窗口。</text>
+
+        <rect x="664" y="94" width="870" height="230" rx="8" fill="#ffffff" stroke="#9bb2d9"/>
+        <rect x="686" y="116" width="300" height="38" rx="6" fill="#0b8f5a"/>
+        <text x="706" y="142" class="card-title">SendByte() 代码顺序</text>
+        <text x="698" y="192" class="mono">for i = 7..0:</text>
+        <text x="740" y="226" class="mono">scl_w(0); sda_w(bit); delay(2);</text>
+        <text x="740" y="260" class="mono">scl_w(1); delay(2);</text>
+        <text x="698" y="304" class="mono">scl_w(0); sda_w(1); delay(2); scl_w(1); delay(2); return sda_r;</text>
+
+        <rect x="26" y="350" width="1534" height="300" rx="8" fill="#ffffff" stroke="#9bb2d9"/>
+        <rect x="48" y="372" width="420" height="38" rx="6" fill="#087a4a"/>
+        <text x="68" y="398" class="card-title">SendByte(0xA5 = 1010 0101)：8 个数据时钟 + 第 9 个 ACK/NACK 时钟</text>
+
+        <g transform="translate(110 450)">
+          <text x="-62" y="28" class="box-title">SCL</text>
+          <text x="-62" y="108" class="box-title">SDA</text>
+          <line x1="0" y1="40" x2="1340" y2="40" stroke="#d8e1f2"/>
+          <line x1="0" y1="120" x2="1340" y2="120" stroke="#d8e1f2"/>
+          <polyline points="0,70 30,70 30,20 80,20 80,70 120,70 120,20 170,20 170,70 210,70 210,20 260,20 260,70 300,70 300,20 350,20 350,70 390,70 390,20 440,20 440,70 480,70 480,20 530,20 530,70 570,70 570,20 620,20 620,70 660,70 660,20 710,20 710,70 760,70 760,20 810,20 810,70 860,70" fill="none" stroke="#087a4a" stroke-width="4"/>
+          <polyline points="0,100 30,100 30,100 80,100 80,100 120,100 120,145 170,145 170,100 210,100 210,100 260,100 260,145 350,145 350,100 390,100 390,100 440,100 440,100 480,100 480,145 530,145 530,100 570,100 570,145 620,145 620,100 660,100 660,100 710,100 710,145 760,145 760,145 810,145 810,145 860,145" fill="none" stroke="#1b5fc9" stroke-width="4"/>
+          <line x1="860" y1="70" x2="920" y2="70" stroke="#087a4a" stroke-width="4"/>
+          <polyline points="920,70 920,20 970,20 970,70 1030,70" fill="none" stroke="#087a4a" stroke-width="4"/>
+          <polyline points="860,145 920,145 920,120 970,120 970,145 1030,145" fill="none" stroke="#d12b2b" stroke-width="4" stroke-dasharray="10 6"/>
+
+          <g class="small" text-anchor="middle">
+            <text x="55" y="0">D7</text><text x="55" y="178">1</text>
+            <text x="145" y="0">D6</text><text x="145" y="178">0</text>
+            <text x="235" y="0">D5</text><text x="235" y="178">1</text>
+            <text x="325" y="0">D4</text><text x="325" y="178">0</text>
+            <text x="415" y="0">D3</text><text x="415" y="178">0</text>
+            <text x="505" y="0">D2</text><text x="505" y="178">1</text>
+            <text x="595" y="0">D1</text><text x="595" y="178">0</text>
+            <text x="705" y="0">D0</text><text x="705" y="178">1</text>
+          </g>
+          <text x="948" y="0" text-anchor="middle" class="box-title warn">第 9 位</text>
+          <text x="948" y="178" text-anchor="middle" class="label warn">sda_r 读 ACK/NACK</text>
+          <line x1="920" y1="-12" x2="920" y2="190" stroke="#d12b2b" stroke-width="2" stroke-dasharray="8 6"/>
+          <line x1="970" y1="-12" x2="970" y2="190" stroke="#d12b2b" stroke-width="2" stroke-dasharray="8 6"/>
+        </g>
+
+        <rect x="26" y="682" width="750" height="168" rx="8" fill="#ffffff" stroke="#9bb2d9"/>
+        <rect x="48" y="704" width="230" height="34" rx="6" fill="#087a4a"/>
+        <text x="68" y="728" class="card-title">SendStop() 停止条件</text>
+        <text x="58" y="770" class="mono">scl_w(0); delay(1); sda_w(0); delay(1);</text>
+        <text x="58" y="806" class="mono">scl_w(1); delay(1); sda_w(1); delay(1);</text>
+        <text x="58" y="838" class="label warn">STOP = SCL 高电平期间，SDA 由 0 -> 1。</text>
+
+        <rect x="812" y="682" width="748" height="168" rx="8" fill="#fff2f2" stroke="#d12b2b"/>
+        <rect x="834" y="704" width="250" height="34" rx="6" fill="#d12b2b"/>
+        <text x="854" y="728" class="card-title">ACK/NACK 统一标注</text>
+        <text x="846" y="774" class="label">协议电平：<tspan class="warn">SDA=0 -> ACK</tspan>，<tspan class="warn">SDA=1 -> NACK</tspan></text>
+        <text x="846" y="814" class="label">SendByte 返回：<tspan class="mono">return sda_r</tspan>，所以返回 0 是 ACK，返回 1 是 NACK。</text>
+      </svg>

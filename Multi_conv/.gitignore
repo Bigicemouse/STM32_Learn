@@ -1,0 +1,24 @@
+# VS Code / EIDE cache
+/.settings
+/.eide/log/
+/.eide.usr.ctx.json
+/.vscode/c_cpp_properties.json
+/.vscode/*.log
+/.vscode/*.lock
+
+# build output
+/build/
+/bin/
+/obj/
+/out/
+/DebugConfig/
+/Listings/
+/Objects/
+
+# Keil cache
+*.uvguix.*
+*.scvd
+
+# EIDE template export
+*.ept
+*.eide-template

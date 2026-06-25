@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "cwd": "${workspaceFolder}",
+      "type": "cortex-debug",
+      "request": "launch",
+      "name": "stlink-gdbserver",
+      "servertype": "stlink",
+      "serverpath": "C:/software/ST/STM32CubeCLT_1.18.0/STLink-gdb-server/bin/ST-LINK_gdbserver.exe",
+      "stm32cubeprogrammer": "C:/software/ST/STM32CubeCLT_1.18.0/STM32CubeProgrammer/bin",
+      "interface": "swd",
+      "device": "STM32F103C8",
+      "executable": "${workspaceFolder}/build/default/ADC_TIM1.axf",
+      "runToEntryPoint": "main",
+      "armToolchainPath": "C:/Users/Admin/.eide/tools/gcc_arm/bin",
+      "preLaunchTask": "build"
+    }
+  ]
+}
