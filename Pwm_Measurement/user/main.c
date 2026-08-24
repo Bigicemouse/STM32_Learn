@@ -186,8 +186,23 @@ void App_IC_Init(void)
     GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8;
     GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    // CH1 配置：直连 TI1，上升沿捕获，无滤波，无分频
-    // → 上升沿到来时将计数值锁存到 CCR1（即一个完整周期的计数）
+    /*
+     * 输入捕获通道配置原理：
+     *   PA8 引脚的 TI1 信号同时连接到 CH1 和 CH2 的输入选择器。
+     *   - CH1 直连 TI1 → CCR1 捕获上升沿时刻的计数值 = 整个周期
+     *   - CH2 交叉连 TI1 → CCR2 捕获下降沿时刻的计数值 = 高电平时间
+     *   两者配合即可算出周期和占空比。
+     *
+     *   配合从模式 SlaveMode_Reset（见下方）：
+     *     计数器在 TI1 上升沿自动归零，
+     *     所以 CCR1 = 两次上升沿间隔 = 周期，CCR2 = 上升沿到下降沿间隔 = 高电平时间。
+     */
+
+    // ── CH1：直连 TI1，上升沿，测周期 ──────────────────────────
+    //   TIM_ICSelection_DirectTI → 输入源选 TI1（不经过交叉矩阵）
+    //   TIM_ICPolarity_Rising   → 上升沿触发捕获，计数值锁存到 CCR1
+    //   TIM_ICPrescaler_DIV1    → 每个有效边沿都捕获（不分频）
+    //   TIM_ICFilter = 0        → 无数字滤波，采样频率 = fCK_INT
     TIM_ICInitTypeDef TIM_InitStruct = {0};
     TIM_InitStruct.TIM_Channel = TIM_Channel_1;
     TIM_InitStruct.TIM_ICFilter = 0;
@@ -196,8 +211,10 @@ void App_IC_Init(void)
     TIM_InitStruct.TIM_ICSelection = TIM_ICSelection_DirectTI;
     TIM_ICInit(TIM1, &TIM_InitStruct);
 
-    // CH2 配置：交叉连接 TI1（IndirectTI），下降沿捕获
-    // → 下降沿到来时将计数值锁存到 CCR2（即高电平持续时间）
+    // ── CH2：交叉连 TI1，下降沿，测高电平 ──────────────────────
+    //   TIM_ICSelection_IndirectTI → 输入源选 TI1 经交叉矩阵到 CH2（同一信号源）
+    //   TIM_ICPolarity_Falling   → 下降沿触发捕获，计数值锁存到 CCR2
+    //   计数器从上升沿开始计数，到下降沿时锁存 → CCR2 = 高电平持续计数值
     TIM_InitStruct.TIM_Channel = TIM_Channel_2;
     TIM_InitStruct.TIM_ICFilter = 0;
     TIM_InitStruct.TIM_ICPolarity = TIM_ICPolarity_Falling;

@@ -1,0 +1,28 @@
+/.codegraph/
+
+# Local IDE and assistant state
+**/.idea/
+**/.codebuddy/
+*.uvguix.*
+
+# Generated build output
+**/build/
+**/cmake-build-*/
+**/Objects/
+**/Listings/
+**/DebugConfig/
+**/MDK-ARM/.cmsis/
+
+# Keil compiler and linker artifacts
+**/*.o
+**/*.d
+**/*.crf
+**/*.axf
+**/*.hex
+**/*.map
+**/*.lst
+**/*.lnp
+**/*.dep
+**/*.build_log.htm
+**/MDK-ARM/*/*.htm
+**/MDK-ARM/*/*.sct
